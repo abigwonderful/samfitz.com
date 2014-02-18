@@ -3,8 +3,10 @@ var gulp = require('gulp'),
 		uglify = require('gulp-uglify'),
 		compass = require('gulp-compass'),
 		concat  = require('gulp-concat'),
-		notify = require('gulp-notify'),
-		EXPRESS_PORT = 4000,
+    livereload = require('gulp-livereload'),
+		notify = require('gulp-notify');
+// a few globals for server settings
+var	EXPRESS_PORT = 4000,
 		EXPRESS_ROOT = __dirname,
 		LIVERELOAD_PORT = 35729;;
 
@@ -30,15 +32,8 @@ function startLivereload() {
 // Notifies livereload of changes detected
 // by `gulp.watch()` 
 function notifyLivereload(event) {
-  // `gulp.watch()` events provide an absolute path
-  // so we need to make it relative to the server root
-  var fileName = require('path').relative(EXPRESS_ROOT, event.path);
- 
-  lr.changed({
-    body: {
-      files: [fileName]
-    }
-  });
+  gulp.src(event.path, {read: false})
+      .pipe(require('gulp-livereload')(lr));
 }
 
 //paths for css/scss
@@ -71,7 +66,8 @@ gulp.task('default', function() {
 
 gulp.task('watch', function() {
 	gulp.watch('scss/*.scss', ['styles']);
-	gulp.watch('*.html', notifyLivereload);
+  gulp.watch('*.html', notifyLivereload);
+  gulp.watch('css/*.css', notifyLivereload);
 
 	
 });
